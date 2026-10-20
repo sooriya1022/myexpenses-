@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  categories   Category[]
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@map("users")
+}
+
+model Category {
+  id           String          @id @default(cuid())
+  name         String
+  type         TransactionType @default(EXPENSE)
+  color        String          @default("#6366f1")
+  icon         String          @default("tag")
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([userId, name, type])
+  @@index([userId])
+  @@map("categories")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Float
+  type        TransactionType @default(EXPENSE)
+  description String?
+  date        DateTime        @default(now())
+  
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId, date])
+  @@map("transactions")
+}
+
+model Budget {
+  id         String    @id @default(cuid())
+  month      Int       // 1 - 12
+  year       Int       // e.g. 2026
+  amount     Float     // Allocated budget in INR (₹)
+  
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([userId, categoryId, month, year])
+  @@index([userId, month, year])
+  @@map("budgets")
+}

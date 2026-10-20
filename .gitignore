@@ -1,0 +1,28 @@
+# Node modules
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+
+# Environment files
+.env
+.env*
+!.env.example
+
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Prisma generated artifacts
+/prisma/migrations/dev.db*
+
+# OS and Editor
+.DS_Store
+*.pem
+.vscode/
+.idea/
