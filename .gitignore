@@ -26,3 +26,5 @@ yarn-error.log*
 *.pem
 .vscode/
 .idea/
+push-to-github.bat
+
